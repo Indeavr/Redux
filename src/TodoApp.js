@@ -1,32 +1,12 @@
-import React, {Component} from 'react';
+import React from 'react';
+import {AddTodo} from "./components/AddTodo";
+import {Footer} from "./components/Footer";
+import {VisibleTodoList} from "./components/VisibleTodoList";
 
-let nextTodoId = 0;
-
-export class TodoApp extends Component {
-    render() {
-        return (
-            <div>
-                <input type="text" ref={node => {
-                    this.input = node;
-                }}/>
-                <button onClick={() => {
-                    this.props.store.dispatch({
-                        type: "ADD_TODO",
-                        text: this.input.value,
-                        id: nextTodoId++
-                    })
-                    this.input.value = "";
-                }}>
-                    Add
-                </button>
-                <ul>
-                    {this.props.todos.map((todo) => {
-                        return (<li key={todo.id}>
-                            {todo.text}
-                        </li>)
-                    })}
-                </ul>
-            </div>
-        );
-    }
-}
+export const TodoApp = () => (
+    <div>
+        <AddTodo/>
+        <VisibleTodoList/>
+        <Footer/>
+    </div>
+)

@@ -1,13 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import {Counter} from './Counter';
 import registerServiceWorker from './registerServiceWorker';
 // import { combineReducers} from 'redux';
-import expect from 'expect';
-import deepFreeze from 'deep-freeze';
 import {TodoApp} from "./TodoApp";
+import {Provider} from 'react-redux';
 
 // reducers
 const todo = (state, action) => {
@@ -37,7 +34,8 @@ const todo = (state, action) => {
 const todos = (state = [], action) => {
     switch (action.type) {
         case "ADD_TODO":
-            return [...state,
+            return [
+                ...state,
                 todo(undefined, action)
             ];
             break;
@@ -112,15 +110,13 @@ const createStore = (reducer) => {
 
 const store = createStore(todoApp);
 
-const render = () => {
-    ReactDOM.render(
-        <TodoApp todos={store.getState().todos} store={store}/>,
-        document.getElementById('root')
-    );
-};
+ReactDOM.render(
+    <Provider store={createStore(todoApp)}>
+        <TodoApp {...store.getState()}/>
+    </Provider>,
+    document.getElementById('root')
+);
 
-store.subscribe(render);
-render();
 registerServiceWorker();
 
 console.log(store.getState());
