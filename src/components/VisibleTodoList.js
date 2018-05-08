@@ -1,57 +1,38 @@
-import React, {Component} from 'react';
+import React from 'react';
+import {connect} from 'react-redux';
 import {TodoList} from "./TodoList";
-import {object} from 'prop-types';
+import {toggleTodo} from "../actions";
+import {withRouter} from "react-router-dom"
 
 const getVisibleTodos = (todos, visibilityFilter) => {
     switch (visibilityFilter) {
-        case "SHOW_ALL":
+        case "all":
             return todos;
             break;
-        case "SHOW_ACTIVE":
+        case "active":
             return todos.filter((todo) => !todo.completed);
             break;
-        case "SHOW_COMPLETED":
+        case "completed":
             return todos.filter((todo) => todo.completed);
             break;
+        default:
+            return todos;
     }
 };
 
-export class VisibleTodoList extends Component {
-    componentDidMount() {
-        const {store} = this.context;
+const mapStateToProps = (state, {match}) => ({
+    todos: getVisibleTodos(
+        state.todos,
+        match.params.filter || "all"
+    )
+});
+// const mapDispatchToProps = (dispatch) => ({
+//     onTodoClicked(id) {
+//         dispatch(toggleTodo(id))
+//     }
+// });
 
-        this.unsubscribe = store.subscribe(() => {
-            this.forceUpdate();
-        })
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
-
-    render() {
-        const {store} = this.context;
-        const state = store.getState();
-
-        return (
-            <TodoList
-                todos={getVisibleTodos(
-                    state.todos,
-                    state.visibilityFilter
-                )}
-                onTodoClicked={id => {
-                    store.dispatch({
-                        type: "TOGGLE_TODO",
-                        id
-                    })
-                }}
-            >
-
-            </TodoList>
-        )
-    }
-};
-
-VisibleTodoList.contextTypes = {
-    store: object
-};
+export const VisibleTodoList = withRouter(connect(
+    mapStateToProps,
+    {onTodoClicked: toggleTodo}
+)(TodoList));
