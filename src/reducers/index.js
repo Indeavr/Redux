@@ -1,9 +1,19 @@
-import {combineReducers} from "redux";
-import {todos} from "./todos";
-
-export const todoApp = combineReducers({
-    todos,
-});
+// import {combineReducers} from "redux";
+// import todos from "./todos";
+// import * as fromTodos from './todos';
+//
+// const todoApp = combineReducers({
+//     todos,
+// });
+//
+// export default todoApp;
+//
+// export const getVisibleTodos = (state, filter) => {
+//     return fromTodos.getVisibleTodos(state.todos, filter);
+// };
+//
+//
+//
 
 
 const combineReducersMine = (reducers) => {
@@ -17,7 +27,6 @@ const combineReducersMine = (reducers) => {
         }, {});
     }
 };
-
 // const todoApp = (state = {}, action) => {
 //     return {
 //         todos: todos(state.todos, action),

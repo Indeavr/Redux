@@ -1,25 +1,21 @@
-import {loadState, saveState} from "./localStorage";
-import throttle from "lodash/throttle";
-import {createStore} from "redux";
-import {todoApp} from "./reducers";
+import {createStore, applyMiddleware} from "redux";
+import todos from "./reducers/todos";
+import promiseMiddleware from 'redux-promise';
+import {createLogger} from 'redux-logger';
 
 export const configureStrore = () => {
-    const persistedState = loadState();
+    const middlewares = [promiseMiddleware];
 
-    const store = createStore(
-        todoApp,
-        persistedState
+    if (process.env.NODE_ENV !== 'production') {
+        middlewares.push(createLogger());
+    }
+
+    return createStore(
+        todos,
+        applyMiddleware(...middlewares)
     );
-
-    store.subscribe(throttle(() => {
-            saveState({
-                todos: store.getState().todos
-            })
-        }, 1000)
-    );
-
-    return store;
 };
+
 
 const createStoreMine = (reducer) => {
     let state;
@@ -46,4 +42,35 @@ const createStoreMine = (reducer) => {
         dispatch,
         subscribe
     }
+};
+
+const applyMiddlewareMine = (store, middlewares) => {
+    middlewares.slice().reverse().forEach(middleware => {
+        store.dispatch = middleware(store)(store.dispatch);
+    })
+};
+
+const loggerMine = (store) => (next) => {
+    if (!console.group) {
+        return next;
+    }
+
+    return (action) => {
+        console.group(action.type);
+        console.log('%c prev state', 'color: gray', store.getState());
+        console.log('%c action', 'color: blue', action);
+        const returnValue = next(action);
+        console.log('%c next state', 'color: green', store.getState());
+        console.groupEnd(action.type);
+
+        return returnValue;
+    }
+};
+
+const promiseSupportMine = (store) => (next) => (action) => {
+    if (typeof action.then === "function") {
+        return action.then(next);
+    }
+
+    return next(action);
 };
